@@ -1,4 +1,4 @@
-package bikini.potato.starts;
+package bikini.potato.stars;
 
 public class Main {
 
