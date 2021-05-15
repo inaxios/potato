@@ -3,6 +3,7 @@ package bikini.potato.email.service.impl;
 import bikini.potato.email.client.EmailClient;
 import bikini.potato.email.client.impl.EmailClientImpl;
 import bikini.potato.email.model.Email;
+import bikini.potato.email.model.IndividualEmail;
 import bikini.potato.email.service.EmailService;
 import bikini.potato.email.service.EncryptionService;
 import bikini.potato.email.service.PropertiesService;
@@ -20,35 +21,41 @@ public class EmailServiceImpl implements EmailService {
     public void send(Email email) {
         List<String> allEmailAddresses = extractAllAddresses(email);
         for(String emailAddress : allEmailAddresses) {
-            sendIndividualEmail(emailAddress, email.getBody(), email.isAsHTML(), email.isEncryptedWithDES(), email.isEncryptedWithAES());
+            IndividualEmail individualEmail = createFromEmail(emailAddress, email);
+            sendIndividualEmail(individualEmail);
         }
     }
 
 
-    private void sendIndividualEmail(String emailAddress, String body, boolean asHTML, boolean encryptWithDES, boolean encryptWithAES) {
+    private void sendIndividualEmail(IndividualEmail individualEmail) {
 
-        String finalBody = appendDisclaimerForExternalAddressesIfNeeded(emailAddress, body);
-        if(encryptWithDES) {
+        String finalBody = appendDisclaimerForExternalAddressesIfNeeded(individualEmail.getAddress(), individualEmail.getBody());
+        if(individualEmail.isEncryptedWithDES()) {
             finalBody = encryptionService.encryptWithDES(finalBody);
         }
-        if(encryptWithAES) {
+        if(individualEmail.isEncryptedWithAES()) {
             finalBody = encryptionService.encryptWithAES(finalBody);
         }
 
-        emailClient.sendEmail(emailAddress, finalBody, asHTML);//todo try catch blah
+        emailClient.sendEmail(individualEmail.getAddress(), finalBody, individualEmail.isAsHTML());//todo try catch blah
     }
 
     private boolean isEmailAddressExternal(String emailAddress) {
         //just some basic crude guess...
-        return emailAddress.split("@")[1].contains("external");
+        return !emailAddress.split("@")[1].contains("internal");
     }
 
     private String appendDisclaimerForExternalAddressesIfNeeded(String emailAddress, String body) {
         if(isEmailAddressExternal(emailAddress)) {
-            return body + " " + propertiesService.getProperty("email.disclaimer");
+            return body + " " + propertiesService.getPropertyAsString("email.disclaimer");
         } else {
             return body;
         }
+    }
+
+    private IndividualEmail createFromEmail(String address, Email email) {
+        Integer maxAttempts = propertiesService.getPropertyAsInteger("email.retries");
+        return new IndividualEmail(address, email.getBody(), email.isAsHTML(), email.isEncryptedWithDES(), email.isEncryptedWithAES(), maxAttempts);
     }
 
     private List<String> extractAllAddresses(Email email) {

@@ -2,5 +2,6 @@ package bikini.potato.email.service;
 
 public interface PropertiesService {
 
-    String getProperty(String key);
+    String getPropertyAsString(String key);
+    Integer getPropertyAsInteger(String key);
 }
