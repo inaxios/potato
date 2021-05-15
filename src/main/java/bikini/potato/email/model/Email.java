@@ -7,6 +7,7 @@ import java.util.Queue;
 
 public class Email {
 
+    private String subject;
     private List<String> to = new ArrayList<String>();
     private List<String> cc = new ArrayList<String>();
     private List<String> bcc = new ArrayList<String>();
@@ -41,6 +42,14 @@ public class Email {
             bcc = new ArrayList<String>();
         }
         bcc.add(emailAddress);
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
     }
 
     public List<String> getTo() {

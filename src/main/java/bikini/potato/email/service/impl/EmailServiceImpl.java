@@ -1,6 +1,7 @@
 package bikini.potato.email.service.impl;
 
 import bikini.potato.email.client.EmailClient;
+import bikini.potato.email.client.exception.EmailClientException;
 import bikini.potato.email.client.impl.EmailClientImpl;
 import bikini.potato.email.model.Email;
 import bikini.potato.email.model.Encryption;
@@ -28,13 +29,24 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
-
     private void sendIndividualEmail(IndividualEmail individualEmail) {
 
         String intermediateBody = appendDisclaimerForExternalAddressesIfNeeded(individualEmail.getAddress(), individualEmail.getBody());
         String finalBody = processEncryptions(intermediateBody, individualEmail.getEncryptions());
 
-        emailClient.sendEmail(individualEmail.getAddress(), finalBody, individualEmail.isAsHTML());//todo try catch blah
+        try {
+            if(individualEmail.getAttemptsLeft() > 0) {
+                emailClient.sendEmail(individualEmail.getAddress(), individualEmail.getSubject(), finalBody, individualEmail.isAsHTML(), individualEmail.getAttemptsLeft());
+            } else {
+                System.out.println("Logging this failure for statistics, analysis, finger pointing etc");
+            }
+        } catch(EmailClientException ex) {
+            individualEmail.decreaseAttemptCount();
+            System.out.println("Sending email to " + individualEmail.getAddress() + " failed!");
+            System.out.println("\treason: " + ex.getMessage());
+            System.out.println("\tattempts left: " + individualEmail.getAttemptsLeft());
+            sendIndividualEmail(individualEmail);
+        }
     }
 
     private String processEncryptions(String text, Queue<Encryption> encryptions) {
@@ -46,7 +58,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     private boolean isEmailAddressExternal(String emailAddress) {
-        //just some basic crude guess...
+        //just some basic, crude guess...
         return !emailAddress.split("@")[1].contains("internal");
     }
 
@@ -60,7 +72,7 @@ public class EmailServiceImpl implements EmailService {
 
     private IndividualEmail createIndividualEmail(String address, Email email) {
         Integer maxAttempts = propertiesService.getPropertyAsInteger("email.retries");
-        return new IndividualEmail(address, email.getBody(), email.isAsHTML(), email.getEncryptions(), maxAttempts);
+        return new IndividualEmail(address, email.getSubject(), email.getBody(), email.isAsHTML(), email.getEncryptions(), maxAttempts);
     }
 
     private List<String> extractAllAddresses(Email email) {

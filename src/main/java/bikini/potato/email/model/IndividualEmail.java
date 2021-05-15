@@ -8,11 +8,13 @@ public class IndividualEmail {
     private String address;
     private String body;
     private boolean asHTML = false;
+    private String subject;
     private Queue<Encryption> encryptions = new LinkedList<Encryption>();
     private Integer attemptsLeft = 0;
 
-    public IndividualEmail(String address, String body, boolean asHTML, Queue<Encryption> encryptions, Integer attemptsLeft) {
+    public IndividualEmail(String address, String subject, String body, boolean asHTML, Queue<Encryption> encryptions, Integer attemptsLeft) {
         this.address = address;
+        this.subject = subject;
         this.body = body;
         this.asHTML = asHTML;
         this.encryptions = encryptions;
@@ -53,5 +55,13 @@ public class IndividualEmail {
 
     public Queue<Encryption> getEncryptions() {
         return encryptions;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
     }
 }

@@ -10,7 +10,7 @@ public class Main {
         System.out.println(getStars(4));
         System.out.println(getStars(5));
     }
-    //todo testak idatzi
+
     private static String getStars(int param) {
 
         long amount = calculateHowManyWeNeed(param);
