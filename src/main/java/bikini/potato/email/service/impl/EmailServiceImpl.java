@@ -23,7 +23,7 @@ public class EmailServiceImpl implements EmailService {
     public void send(Email email) {
         List<String> allEmailAddresses = extractAllAddresses(email);
         for(String emailAddress : allEmailAddresses) {
-            IndividualEmail individualEmail = createFromEmail(emailAddress, email);
+            IndividualEmail individualEmail = createIndividualEmail(emailAddress, email);
             sendIndividualEmail(individualEmail);
         }
     }
@@ -31,9 +31,8 @@ public class EmailServiceImpl implements EmailService {
 
     private void sendIndividualEmail(IndividualEmail individualEmail) {
 
-        String aa = appendDisclaimerForExternalAddressesIfNeeded(individualEmail.getAddress(), individualEmail.getBody());
-
-        String finalBody = processEncryptions(aa, individualEmail.getEncryptions());
+        String intermediateBody = appendDisclaimerForExternalAddressesIfNeeded(individualEmail.getAddress(), individualEmail.getBody());
+        String finalBody = processEncryptions(intermediateBody, individualEmail.getEncryptions());
 
         emailClient.sendEmail(individualEmail.getAddress(), finalBody, individualEmail.isAsHTML());//todo try catch blah
     }
@@ -59,7 +58,7 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
-    private IndividualEmail createFromEmail(String address, Email email) {
+    private IndividualEmail createIndividualEmail(String address, Email email) {
         Integer maxAttempts = propertiesService.getPropertyAsInteger("email.retries");
         return new IndividualEmail(address, email.getBody(), email.isAsHTML(), email.getEncryptions(), maxAttempts);
     }
