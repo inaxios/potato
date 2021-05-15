@@ -1,7 +1,9 @@
 package bikini.potato.email.model;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 public class Email {
 
@@ -10,8 +12,7 @@ public class Email {
     private List<String> bcc = new ArrayList<String>();
     private String body;
     private boolean asHTML = false;
-    private boolean encryptedWithDES = false;
-    private boolean encryptedWithAES = false;
+    private Queue<Encryption> encryptions = new LinkedList<Encryption>();
 
     public boolean isAsHTML() {
         return asHTML;
@@ -19,22 +20,6 @@ public class Email {
 
     public void setAsHTML(boolean asHTML) {
         this.asHTML = asHTML;
-    }
-
-    public boolean isEncryptedWithDES() {
-        return encryptedWithDES;
-    }
-
-    public void setEncryptedWithDES(boolean encryptedWithDES) {
-        this.encryptedWithDES = encryptedWithDES;
-    }
-
-    public boolean isEncryptedWithAES() {
-        return encryptedWithAES;
-    }
-
-    public void setEncryptedWithAES(boolean encryptedWithAES) {
-        this.encryptedWithAES = encryptedWithAES;
     }
 
     public void addTO(String emailAddress) {
@@ -88,5 +73,16 @@ public class Email {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public void addEncryption(Encryption algorithm) {
+        if(encryptions == null) {
+            encryptions = new LinkedList<Encryption>();
+        }
+        encryptions.add(algorithm);
+    }
+
+    public Queue<Encryption> getEncryptions() {
+        return encryptions;
     }
 }

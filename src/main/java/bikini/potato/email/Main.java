@@ -1,6 +1,7 @@
 package bikini.potato.email;
 
 import bikini.potato.email.model.Email;
+import bikini.potato.email.model.Encryption;
 import bikini.potato.email.service.EmailService;
 import bikini.potato.email.service.impl.EmailServiceImpl;
 
@@ -32,8 +33,8 @@ public class Main {
         Email email = new Email();
         email.addTO("spongebob.squarepants@internal.com");
         email.setAsHTML(true);
-        email.setEncryptedWithDES(true);
-        email.setBody("Egunon bizkaia!");//todo retry
+        email.addEncryption(Encryption.DES);
+        email.setBody("two burgers please");//todo retry
 
         return email;
     }
@@ -42,25 +43,22 @@ public class Main {
         //sending an HTML email to an outside resource, with a disclaimer added at the end and
         //encrypted with AES with retries in case of errors
         Email email = new Email();
-        email.addTO("manolo@internal.com");
-        email.addBCC("txema@external.com");
+        email.addTO("scarlet.johansson@anotherexternal.com");
         email.setAsHTML(true);
-        email.setEncryptedWithAES(true);
-        email.setBody("Egunon bizkaia!");//todo retry
+        email.addEncryption(Encryption.AES);
+        email.setBody("about last night, sorry, blah blah");//todo retry
 
         return email;
     }
 
     private static Email getEmailFour() {
         // sending a plain text email to an outside resource and encrypted first with DES and then
-        // with AES//todo encrypt order matters
+        // with AES
         Email email = new Email();
-
-        email.addTO("manolo@external.com");
-        email.addBCC("txema@external.com");
-        email.setEncryptedWithDES(true);
-        email.setEncryptedWithAES(true);
-        email.setBody("Egunon bizkaia!");//todo retry
+        email.addTO("natalie.portman@fancymail.com");
+        email.addEncryption(Encryption.DES);
+        email.addEncryption(Encryption.AES);
+        email.setBody("we're hiring! blah blah");
 
         return email;
     }
