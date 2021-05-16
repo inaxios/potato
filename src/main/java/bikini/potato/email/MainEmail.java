@@ -5,10 +5,9 @@ import bikini.potato.email.model.Encryption;
 import bikini.potato.email.service.EmailService;
 import bikini.potato.email.service.impl.EmailServiceImpl;
 
-public class Main {
+public class MainEmail {
 
     public static void main(String[] args) {
-
         EmailService emailService = new EmailServiceImpl();
 
         emailService.send(getEmailOne());

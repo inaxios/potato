@@ -1,6 +1,6 @@
 package bikini.potato.stars;
 
-public class Main {
+public class MainStars {
 
     public static void main(String[] args) {
         System.out.println(getStars(0));
@@ -11,7 +11,7 @@ public class Main {
         System.out.println(getStars(5));
     }
 
-    private static String getStars(int param) {
+    protected static String getStars(int param) {
 
         long amount = calculateHowManyWeNeed(param);
         String result = "*";
@@ -21,7 +21,8 @@ public class Main {
         return result;
     }
 
-    private static long calculateHowManyWeNeed(int param) {
+    protected static long calculateHowManyWeNeed(int param) {
+    //since the specification doesn't mention anything about the range of possible values of the parameter this solution should be ok, for low numbers at least
         if(param == 0) {
             return 1;
         }
